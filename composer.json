@@ -1,0 +1,21 @@
+{
+    "name": "helissonms/webservice-caixa",
+    "description": "Integraçao com a Caixa Economica Federal para gerenciamento de boletos (registro/baixa/alteraçao)",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/helissonms/webservice-caixa",
+    "authors": [
+        {
+            "name": "Hélisson Müller",
+            "email": "helisson.ms@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "WebserviceCaixa\\": "src/"
+        }
+    }
+}
