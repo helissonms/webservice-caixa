@@ -19,21 +19,21 @@ class Pessoa
      *
      * @property string
      */
-    protected string $tipo;
+    protected $tipo;
 
     /**
      * Nome ou Razão social do pagador, dependendo do tipo (PF ou PJ)
      *
      * @property string
      */
-    protected string $nome;
+    protected $nome;
 
     /**
      * CPF ou CNPJ do pagador, dependendo do tipo (PF ou PJ)
      *
      * @property string
      */
-    protected string $documento;
+    protected $documento;
 
     /**
      * Definição da pessoa (Pagador e/ou Avalista)

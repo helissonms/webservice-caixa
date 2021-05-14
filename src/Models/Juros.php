@@ -21,28 +21,28 @@ class Juros
      *
      * @property string
      */
-    protected string $tipo;
+    protected $tipo;
 
     /**
      * (NE010) Data de inicio da cobrança do juros. Deve ser maior que a data de vencimento do título
      *
      * @property DateTimeInterface
      */
-    protected DateTimeInterface $data;
+    protected $data;
 
     /**
      * (NE011) Define o valor fixo a ser cobrado. Caso o tipo seja ISENTO, o valor sempre será 0.00.
      *
      * @property float
      */
-    protected float $valor;
+    protected $valor;
 
     /**
      * (NE011) Define o percentual do valor original a ser cobrado
      *
      * @property float
      */
-    protected float $percentual;
+    protected $percentual;
 
     /**
      * Juros Mora do título

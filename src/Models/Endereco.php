@@ -9,35 +9,35 @@ class Endereco
      *
      * @property string
      */
-    protected string $logradouro;
+    protected $logradouro;
 
     /**
      * (NE017) Texto referente a localização do bairro utilizado para entrega de correspondência
      *
      * @property string
      */
-    protected string $bairro;
+    protected $bairro;
 
     /**
      * (NE019) Texto referente ao nome do município componente do endereço utilizado para entrega de correspondência
      *
      * @property string
      */
-    protected string $cidade;
+    protected $cidade;
 
     /**
      * (NE020) Código do estado, unidade da federação componente do endereço utilizado para entrega de correspondência.
      *
      * @property string
      */
-    protected string $uf;
+    protected $uf;
 
     /**
      * (NE018) Código adotado pelos CORREIOS para identificação de logradouros.
      *
      * @property string
      */
-    protected string $cep;
+    protected $cep;
 
 
     /**

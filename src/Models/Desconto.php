@@ -22,26 +22,26 @@ class Desconto
      *
      * @property string
      */
-    protected string $tipo;
+    protected $tipo;
 
     /**
      * (NE024) Valor fixo do desconto (dependendo do tipo)
      *
      * @property float
      */
-    protected float $valor;
+    protected $valor;
 
     /**
      * (NE024) Valor percentual do desconto (dependendo do tipo)
      *
      * @property float
      */
-    protected float $percentual;
+    protected $percentual;
 
     /**
      * (NE025) Data limite do desconto do título de cobrança
      */
-    protected DateTimeInterface $data;
+    protected $data;
 
     /**
      * (NE024A e NE025) Configuração do desconto a ser aplicado. Dependendo do tipo, pode ser aplicados até 3 descontos

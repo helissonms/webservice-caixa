@@ -19,14 +19,14 @@ class PosVencimento
      *
      * @property string
      */
-    protected string $acao;
+    protected $acao;
 
     /**
      * (NE014) Número de dias para o protesto ou baixa por devolução do título não pago após o vencimento.
      *
      * @property int
      */
-    protected int $dias;
+    protected $dias;
 
     /**
      * (NE013 e NE014) Instrução de Protesto ou Devolução

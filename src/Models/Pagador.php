@@ -9,7 +9,7 @@ class Pagador extends Pessoa
      *
      * @property \WebserviceCaixa\Models\Endereco
      */
-    protected string $endereco;
+    protected $endereco;
 
     /**
      * Definição do pagador do título

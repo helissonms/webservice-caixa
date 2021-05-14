@@ -12,119 +12,119 @@ class Titulo
      *
      * @property string
      */
-    protected string $numero;
+    protected $numero;
 
     /**
      * (NE004) Data de vencimento do título
      *
      * @property DateTimeInterface
      */
-    protected DateTimeInterface $vencimento;
+    protected $vencimento;
 
     /**
      * (NE005) Valor original do título
      *
      * @property float
      */
-    protected float $valor;
+    protected $valor;
 
     /**
      * (NE006) Espécie do título
      *
      * @property int
      */
-    protected int $especie;
+    protected $especie;
 
     /**
      * (NE007) Identificação de título Aceito (S) ou Não Aceito (N)
      *
      * @property string
      */
-    protected string $aceite;
+    protected $aceite;
 
     /**
      * (NE015) Código adotado pela FEBRABAN para identificar a moeda referenciada no Título.
      *
      * @property string
      */
-    protected string $codigoMoeda = '09';
+    protected $codigoMoeda = '09';
 
     /**
      * (NE012) Valor do abatimento (redução do valor do documento, devido a algum problema)
      *
      * @property float
      */
-    protected float $valorAbatimento = 0.00;
+    protected $valorAbatimento = 0.00;
 
     /**
      * (NE008) Data de emissão do título
      *
      * @property DateTimeInterface
      */
-    protected DateTimeInterface $emissao;
+    protected $emissao;
 
     /**
      * (NE009 e NE010) Configuração dos Juros
      *
      * @property \WebserviceCaixa\Models\Juros
      */
-    protected Juros $juros;
+    protected $juros;
 
     /**
      * (NE013 e NE014) Instrução de Protesto ou Devolução
      *
      * @property \WebserviceCaixa\Models\PosVencimento
      */
-    protected PosVencimento $posVencimento;
+    protected $posVencimento;
 
     /**
      * (NE016) Configurações do Pagador
      *
      * @property \WebserviceCaixa\Models\Pagador
      */
-    protected Pagador $pagador;
+    protected $pagador;
 
     /**
      * (NE030, NE031, NE032 e NE033) Configuração do pagamento
      *
      * @property \WebserviceCaixa\Models\Pagamento
      */
-    protected Pagamento $pagamento;
+    protected $pagamento;
 
      /**
      * (NE024, NE024A e NE025) Array de descontos, sendo considerado até 3 descontos
      *
      * @property array
      */
-    protected array $descontos = [];
+    protected $descontos = [];
 
     /**
      * (NE026) Valor do IOF a Ser Recolhido
      *
      * @property float
      */
-    protected float $valorIof;
+    protected $valorIof;
 
     /**
      * (NE027) Campo destinado para uso da Empresa Beneficiário para identificação do Título. (25 caracteres)
      *
      * @property string
      */
-    protected string $identificacaoEmpresa;
+    protected $identificacaoEmpresa;
 
     /**
      * (NE028) Até duas linhas de 40 caracteres. Cada índice do array representa uma linha.
      *
      * @property array
      */
-    protected array $fichaCompensacaoMensagens = [];
+    protected $fichaCompensacaoMensagens = [];
 
     /**
      * (NE029) Até duas linhas de 40 caracteres. Cada índice do array representa uma linha.
      *
      * @property array
      */
-    protected array $reciboPagadorMensagens = [];
+    protected $reciboPagadorMensagens = [];
 
     /**
      * Título a ser registrado

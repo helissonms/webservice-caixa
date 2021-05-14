@@ -28,42 +28,42 @@ class Pagamento
      *
      * @property string
      */
-    protected string $tipo;
+    protected $tipo;
 
     /**
      * (NE031) Quantidade de Pagamento Possíveis
      *
      * @property int
      */
-    protected int $quantidadePermitida;
+    protected $quantidadePermitida;
 
     /**
      * (NE032) Identificar o Valor Mínimo admissível para pagamento
      *
      * @property float
      */
-    protected float $valorMinimo;
+    protected $valorMinimo;
 
     /**
      * (NE032) Identificar o Valor Máximo admissível para pagamento
      *
      * @property float
      */
-    protected float $valorMaximo;
+    protected $valorMaximo;
 
     /**
      * (NE033) Identificar o Percentual Mínimo admissível para pagamento
      *
      * @property float
      */
-    protected float $percentualMinimo;
+    protected $percentualMinimo;
 
     /**
      * (NE033) Identificar o Percentual Máximo admissível para pagamento
      *
      * @property float
      */
-    protected float $percentualMaximo;
+    protected $percentualMaximo;
 
     /**
      * Configuração

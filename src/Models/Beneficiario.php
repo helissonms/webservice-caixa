@@ -4,9 +4,15 @@ namespace WebserviceCaixa\Models;
 
 class Beneficiario
 {
-    protected string $cnpj;
+    /**
+     * @property string
+     */
+    protected $cnpj;
 
-    protected string $codigo;
+    /**
+     * @property string
+     */
+    protected $codigo;
 
     /**
      * @param string $cnpj
