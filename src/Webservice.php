@@ -7,6 +7,7 @@ use DateTimeZone;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use stdClass;
 use GuzzleHttp\Client as HttpClient;
 use Psr\Http\Message\ResponseInterface;
 use WebserviceCaixa\Models\Beneficiario;
@@ -74,7 +75,7 @@ class Webservice
      *
      * @param \WebserviceCaixa\Models\Titulo $titulo
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return stdClass|object
      *
      * @throws \GuzzleHttp\Exception\ClientException
      * @throws \GuzzleHttp\Exception\ServerException
@@ -90,7 +91,7 @@ class Webservice
 
         $incluiBoleto = $titulo->toDOMNode($incluiBoleto);
 
-        return (new HttpClient)
+        $resposta = (new HttpClient)
             ->post('https://barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo', [
                 'curl' => [
                     CURLOPT_SSL_CIPHER_LIST => 'DEFAULT:!DH',
@@ -101,6 +102,8 @@ class Webservice
                 ],
                 'body' => $dom->saveXML(),
             ]);
+
+        return $this->trataResposta((string) $resposta->getBody());
     }
 
     protected function getEstruturaPrincipal(Titulo $titulo, string $operacao = 'INCLUI_BOLETO')
@@ -151,5 +154,34 @@ class Webservice
         $hash = hash('sha256', $dados, true);
 
         return base64_encode($hash);
+    }
+
+    protected function trataResposta(string $xml)
+    {
+        $dom = new DOMDocument;
+        $dom->loadXML($xml);
+
+        return $objeto = $this->converteXMLParaObjeto($dom);
+    }
+
+    protected function converteXMLParaObjeto(DOMNode $node, stdClass $objeto = null)
+    {
+        $objeto = $objeto ?: new stdClass;
+
+        foreach ($node->childNodes as $node) {
+            if ($node->hasAttributes()) {
+                $objeto->_attributes = new stdClass;
+
+                foreach ($node->attributes as $attribute) {
+                    $objeto->_attributes->{$attribute->name} = $attribute->value;
+                }
+            }
+
+            $objeto->{$node->localName} = $node->hasChildNodes() && $node->firstChild->nodeType === XML_ELEMENT_NODE
+                ? $this->converteXMLParaObjeto($node)
+                : $node->nodeValue;
+        }
+
+        return $objeto;
     }
 }
