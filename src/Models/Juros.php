@@ -2,6 +2,8 @@
 
 namespace WebserviceCaixa\Models;
 
+use DOMElement;
+use DOMNode;
 use WebserviceCaixa\Exceptions\JurosTipoInvalidoException;
 
 class Juros
@@ -59,6 +61,16 @@ class Juros
         }
 
         $this->tipo = $tipo;
+    }
+
+    /**
+     * (NE009) Tipo do juros mora
+     *
+     * @return string
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
     }
 
     /**
@@ -185,5 +197,28 @@ class Juros
             ->setData($data)
             ->setValor($valor)
             ->setPercentual($percentual);
+    }
+
+    public function toDOMNode(DOMNode $no)
+    {
+        $juros = $no->appendChild(new DOMElement('JUROS_MORA'));
+
+        $juros->appendChild(new DOMElement('TIPO', $this->tipo));
+
+        switch ($this->tipo) {
+            case self::TIPO_ISENTO:
+                $juros->appendChild(new DOMElement('VALOR', number_format($this->valor, 2, '.', '')));
+                break;
+            case self::TIPO_VALOR_POR_DIA:
+                $juros->appendChild(new DOMElement('DATA', $this->data->format('Y-m-d')));
+                $juros->appendChild(new DOMElement('VALOR', number_format($this->valor, 2, '.', '')));
+                break;
+            case self::TIPO_TAXA_MENSAL:
+                $juros->appendChild(new DOMElement('DATA', $this->data->format('Y-m-d')));
+                $juros->appendChild(new DOMElement('PERCENTUAL', number_format($this->percentual, 2, '.', '')));
+                break;
+        }
+
+        return $no;
     }
 }

@@ -2,6 +2,9 @@
 
 namespace WebserviceCaixa\Models;
 
+use DOMElement;
+use DOMNode;
+
 class SacadorAvalista extends Pessoa
 {
     /**
@@ -16,5 +19,23 @@ class SacadorAvalista extends Pessoa
     public function __construct(string $tipo, string $nome, string $documento)
     {
         parent::__construct($tipo, $nome, $documento);
+    }
+
+    public function toDOMNode(DOMNode $no)
+    {
+        $sacadorAvalista = $no->appendChild(new DOMElement('SACADOR_AVALISTA'));
+
+        switch ($this->tipo) {
+            case self::TIPO_PESSOA_JURIDICA:
+                $sacadorAvalista->appendChild(new DOMElement('CNPJ', $this->documento));
+                $sacadorAvalista->appendChild(new DOMElement('RAZAO_SOCIAL', $this->nome));
+                break;
+            default:
+                $sacadorAvalista->appendChild(new DOMElement('CPF', $this->documento));
+                $sacadorAvalista->appendChild(new DOMElement('NOME', $this->nome));
+                break;
+        }
+
+        return $no;
     }
 }

@@ -2,6 +2,10 @@
 
 namespace WebserviceCaixa\Models;
 
+use DOMElement;
+use DOMNode;
+use Illuminate\Support\Str;
+
 class Endereco
 {
     /**
@@ -98,5 +102,18 @@ class Endereco
     public function getCep()
     {
         return $this->cep;
+    }
+
+    public function toDOMNode(DOMNode $no)
+    {
+        $endereco = $no->appendChild(new DOMElement('ENDERECO'));
+
+        foreach (get_object_vars($this) as $propriedade => $valor) {
+            $propriedade = Str::upper(Str::snake($propriedade));
+
+            $endereco->appendChild(new DOMElement($propriedade, $valor));
+        }
+
+        return $no;
     }
 }

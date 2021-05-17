@@ -20,7 +20,23 @@ class Beneficiario
      */
     public function __construct(string $cnpj, string $codigo)
     {
-        $this->cnpj = $cnpj;
+        $this->cnpj = preg_replace('/\D/', '', $cnpj);
         $this->codigo = $codigo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCnpj()
+    {
+        return $this->cnpj;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
     }
 }

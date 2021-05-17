@@ -3,6 +3,9 @@
 namespace WebserviceCaixa\Models;
 
 use DateTimeInterface;
+use DOMElement;
+use DOMNode;
+use Illuminate\Support\Str;
 
 class Desconto
 {
@@ -91,5 +94,26 @@ class Desconto
     public function getData()
     {
         return $this->data;
+    }
+
+    public function toDOMNode(DOMNode $no)
+    {
+        $desconto = $no->appendChild(new DOMElement('DESCONTO'));
+
+        if (in_array($this->tipo, [self::TIPO_VALOR_FIXO_ATE_DATA, self::TIPO_PERCENTUAL_ATE_DATA])) {
+            $desconto->appendChild(new DOMElement('DATA', $this->data->format('Y-m-d')));
+        }
+
+        if ($this->tipo === self::TIPO_ISENTO || Str::startsWith($this->tipo, 'VALOR')) {
+            $desconto->appendChild(new DOMElement('VALOR', number_format($this->valor, 2, '.', '')));
+        }
+
+        if (Str::startsWith($this->tipo, 'PERCENTUAL')) {
+            $percentual = number_format($this->percentual, 2, '.', '');
+        }
+
+        $desconto->appendChild(new DOMElement('TIPO', $this->tipo));
+
+        return $no;
     }
 }

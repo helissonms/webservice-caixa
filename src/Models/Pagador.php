@@ -2,6 +2,9 @@
 
 namespace WebserviceCaixa\Models;
 
+use DOMElement;
+use DOMNode;
+
 class Pagador extends Pessoa
 {
     /**
@@ -34,5 +37,27 @@ class Pagador extends Pessoa
     public function getEndereco()
     {
         return $this->endereco;
+    }
+
+    public function toDOMNode(DOMNode $no)
+    {
+        $pagador = $no->appendChild(new DOMElement('PAGADOR'));
+
+        switch ($this->tipo) {
+            case self::TIPO_PESSOA_JURIDICA:
+                $pagador->appendChild(new DOMElement('CNPJ', $this->documento));
+                $pagador->appendChild(new DOMElement('RAZAO_SOCIAL', $this->nome));
+                break;
+            default:
+                $pagador->appendChild(new DOMElement('CPF', $this->documento));
+                $pagador->appendChild(new DOMElement('NOME', $this->nome));
+                break;
+        }
+
+        if ($this->endereco) {
+            $this->endereco->toDOMNode($pagador);
+        }
+
+        return $no;
     }
 }

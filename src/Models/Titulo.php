@@ -4,22 +4,32 @@ namespace WebserviceCaixa\Models;
 
 use DateTimeInterface;
 use DateTime;
+use DOMElement;
+use DOMNode;
+use Illuminate\Support\Str;
 
 class Titulo
 {
+    /**
+     * (NE002) Nosso Número
+     *
+     * @property string
+     */
+    protected $nossoNumero;
+
     /**
      * (NE003) Número do título
      *
      * @property string
      */
-    protected $numero;
+    protected $numeroDocumento;
 
     /**
      * (NE004) Data de vencimento do título
      *
      * @property DateTimeInterface
      */
-    protected $vencimento;
+    protected $dataVencimento;
 
     /**
      * (NE005) Valor original do título
@@ -33,35 +43,21 @@ class Titulo
      *
      * @property int
      */
-    protected $especie;
+    protected $tipoEspecie;
 
     /**
      * (NE007) Identificação de título Aceito (S) ou Não Aceito (N)
      *
      * @property string
      */
-    protected $aceite;
-
-    /**
-     * (NE015) Código adotado pela FEBRABAN para identificar a moeda referenciada no Título.
-     *
-     * @property string
-     */
-    protected $codigoMoeda = '09';
-
-    /**
-     * (NE012) Valor do abatimento (redução do valor do documento, devido a algum problema)
-     *
-     * @property float
-     */
-    protected $valorAbatimento = 0.00;
+    protected $flagAceite = 'N';
 
     /**
      * (NE008) Data de emissão do título
      *
      * @property DateTimeInterface
      */
-    protected $emissao;
+    protected $dataEmissao;
 
     /**
      * (NE009 e NE010) Configuração dos Juros
@@ -71,11 +67,25 @@ class Titulo
     protected $juros;
 
     /**
+     * (NE012) Valor do abatimento (redução do valor do documento, devido a algum problema)
+     *
+     * @property float
+     */
+    protected $valorAbatimento = 0.00;
+
+    /**
      * (NE013 e NE014) Instrução de Protesto ou Devolução
      *
      * @property \WebserviceCaixa\Models\PosVencimento
      */
     protected $posVencimento;
+
+    /**
+     * (NE015) Código adotado pela FEBRABAN para identificar a moeda referenciada no Título.
+     *
+     * @property string
+     */
+    protected $codigoMoeda = '09';
 
     /**
      * (NE016) Configurações do Pagador
@@ -85,13 +95,13 @@ class Titulo
     protected $pagador;
 
     /**
-     * (NE030, NE031, NE032 e NE033) Configuração do pagamento
+     * (NE016) Configurações do Sacador/Avalista
      *
-     * @property \WebserviceCaixa\Models\Pagamento
+     * @property \WebserviceCaixa\Models\SacadorAvalista
      */
-    protected $pagamento;
+    protected $sacadorAvalista;
 
-     /**
+    /**
      * (NE024, NE024A e NE025) Array de descontos, sendo considerado até 3 descontos
      *
      * @property array
@@ -115,54 +125,73 @@ class Titulo
     /**
      * (NE028) Até duas linhas de 40 caracteres. Cada índice do array representa uma linha.
      *
-     * @property array
+     * @property \WebserviceCaixa\Models\FichaCompensacao
      */
-    protected $fichaCompensacaoMensagens = [];
+    protected $fichaCompensacao;
 
     /**
      * (NE029) Até duas linhas de 40 caracteres. Cada índice do array representa uma linha.
      *
-     * @property array
+     * @property \WebserviceCaixa\Models\ReciboPagador
      */
-    protected $reciboPagadorMensagens = [];
+    protected $reciboPagador;
+
+    /**
+     * (NE030, NE031, NE032 e NE033) Configuração do pagamento
+     *
+     * @property \WebserviceCaixa\Models\Pagamento
+     */
+    protected $pagamento;
 
     /**
      * Título a ser registrado
      *
-     * @param string $numero (NE003) Número do título
-     * @param DateTimeInterface $vencimento (NE004) Data de vencimento do título
+     * @param string $numeroDocumento (NE003) Número do título
+     * @param DateTimeInterface $dataVencimento (NE004) Data de vencimento do título
      * @param float $valor (NE005) Valor original do título
-     * @param int $especie (NE006) Espécie do título
-     * @param string $aceite (NE007) Identificação de título Aceito (S) ou Não Aceito (N)
-     * @param DateTimeInterface $emissao (NE008) Data de emissão do título
+     * @param int $tipoEspecie (NE006) Espécie do título
+     * @param string $flagAceite (NE007) Identificação de título Aceito (S) ou Não Aceito (N)
+     * @param DateTimeInterface $dataEmissao (NE008) Data de emissão do título
      *
      * return @return void
      */
-    public function __construct(string $numero, DateTimeInterface $vencimento, float $valor, int $especie = 99, string $aceite = 'S', DateTimeInterface $emissao = new DateTime('now'))
+    public function __construct(string $numeroDocumento, DateTimeInterface $dataVencimento, float $valor, int $tipoEspecie = 99, string $flagAceite = 'N', DateTimeInterface $dataEmissao = null)
     {
-        $this->numero = $numero;
-        $this->vencimento = $vencimento;
+        $this->nossoNumero = '14' . str_pad($numeroDocumento, 15, '0', STR_PAD_LEFT);
+        $this->numeroDocumento = $numeroDocumento;
+        $this->dataVencimento = $dataVencimento;
         $this->valor = $valor;
-        $this->especie = $especie;
-        $this->aceite = $aceite;
+        $this->tipoEspecie = $tipoEspecie;
+        $this->flagAceite = $flagAceite;
 
-        $this->emissao = $emissao ?: new DateTime('now');
+        $this->dataEmissao = $dataEmissao ?: new DateTime('now');
+
+        $this->juros = Juros::isento();
+        $this->posVencimento = PosVencimento::devolver();
     }
 
     /**
      * @return string
      */
-    public function getNumero()
+    public function getNossoNumero()
     {
-        return $this->numero;
+        return $this->nossoNumero;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNumeroDocumento()
+    {
+        return $this->numeroDocumento;
     }
 
     /**
      * @return DateTimeInterface
      */
-    public function getVencimento()
+    public function getDataVencimento()
     {
-        return $this->vencimento;
+        return $this->dataVencimento;
     }
 
     /**
@@ -176,7 +205,7 @@ class Titulo
     /**
      * @return int
      */
-    public function getEspecie()
+    public function getTipoEspecie()
     {
         return $this->especie;
     }
@@ -184,17 +213,25 @@ class Titulo
     /**
      * @return string
      */
-    public function getAceite()
+    public function getCodigoMoeda()
     {
-        return $this->aceite;
+        return $this->codigoMoeda;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFlagAceite()
+    {
+        return $this->flagAceite;
     }
 
     /**
      * @return DateTimeInterface
      */
-    public function getEmissao()
+    public function getDataEmissao()
     {
-        return $this->emissao;
+        return $this->dataEmissao;
     }
 
     /**
@@ -213,7 +250,7 @@ class Titulo
      */
     public function getValorAbatimento()
     {
-        return $this->valorAbatimento;
+        return $this->valorAbatimento ?? 0.00;
     }
 
     /**
@@ -232,7 +269,7 @@ class Titulo
      */
     public function getJuros()
     {
-        return $this->juros ?: Juros::isento();
+        return $this->juros;
     }
 
     /**
@@ -251,7 +288,7 @@ class Titulo
      */
     public function getPosVencimento()
     {
-        return $this->posVencimento ?: new PosVencimento();
+        return $this->posVencimento;
     }
 
     /**
@@ -271,6 +308,25 @@ class Titulo
     public function getPagador()
     {
         return $this->pagador;
+    }
+
+    /**
+     * @param \WebserviceCaixa\Models\SacadorAvalista $sacadorAvalista
+     *
+     * @return \WebserviceCaixa\Models\Titulo
+     */
+    public function setSacadorAvalista(SacadorAvalista $sacadorAvalista)
+    {
+        $this->sacadorAvalista = $sacadorAvalista;
+        return $this;
+    }
+
+    /**
+     * @return null|\WebserviceCaixa\Models\SacadorAvalista
+     */
+    public function getSacadorAvalista()
+    {
+        return $this->sacadorAvalista;
     }
 
     /**
@@ -360,39 +416,91 @@ class Titulo
     /**
      * (NE028) Até duas linhas de 40 caracteres cada. Cada índice do array representa uma linha.
      *
-     * @param array $mensagens
+     * @param \WebserviceCaixa\Models\FichaCompensacao $fichaCompensacao
      *
      * @return \WebserviceCaixa\Models\Titulo
      */
-    public function setFichaCompensacaoMensagens(array $mensagens)
+    public function setFichaCompensacao(FichaCompensacao $fichaCompensacao = null)
     {
-        $this->fichaCompensacaoMensagens = $mensagens;
+        $this->fichaCompensacao = $fichaCompensacao ?: new FichaCompensacao();
         return $this;
     }
 
     /**
-     * @return array
+     * @return null|\WebserviceCaixa\Models\FichaCompensacao
      */
-    public function getFichaCompensacaoMensagens()
+    public function getFichaCompensacao()
     {
-        return $this->fichaCompensacaoMensagens;
+        return $this->fichaCompensacao;
     }
 
     /**
      * (NE029) Até quatro linhas de 40 caracteres cada. Cada índice do array representa uma linha.
      *
-     * @param array $mensagens
+     * @param \WebserviceCaixa\Models\ReciboPagador $reciboPagador
      *
      * @return \WebserviceCaixa\Models\Titulo
      */
-    public function setReciboPagadorMensagens(array $mensagens)
+    public function setReciboPagador(ReciboPagador $reciboPagador)
     {
-        $this->reciboPagadorMensagens = $mensagens;
+        $this->reciboPagador = $reciboPagador;
         return $this;
     }
 
-    public function getReciboPagadorMensagens()
+    /**
+     * @return null|\WebserviceCaixa\Models\ReciboPagador
+     */
+    public function getReciboPagador()
     {
-        return $this->reciboPagadorMensagens;
+        return $this->reciboPagador;
+    }
+
+    public function toDOMNode(DOMNode $no)
+    {
+        $titulo = $no->appendChild(new DOMElement('TITULO'));
+
+        foreach (get_object_vars($this) as $chave => $valor) {
+            $propriedade = Str::upper(Str::snake($chave));
+
+            if (is_string($valor) || is_int($valor)) {
+                $titulo->appendChild(new DOMElement($propriedade, $valor));
+
+                continue;
+            }
+
+            if (is_float($valor)) {
+                $titulo->appendChild(new DOMElement($propriedade, number_format($valor, 2, '.', '')));
+
+                continue;
+            }
+
+            if (is_array($valor)) {
+                if ($chave === 'descontos') {
+                    $descontos = $titulo->appendChild(new DOMElement('DESCONTOS'));
+
+                    foreach ($valor as $desconto) {
+                        $desconto->toDOMNode($descontos);
+                    }
+
+                    continue;
+                }
+            }
+
+            if (is_object($valor)) {
+                if (method_exists($valor, 'toDOMNode')) {
+                    $valor->toDOMNode($titulo);
+
+                    continue;
+                }
+
+                if (method_exists($valor, 'format')) {
+                    $titulo->appendChild(new DOMElement($propriedade, $valor->format('Y-m-d')));
+                }
+
+                continue;
+            }
+        }
+
+        return $no;
     }
 }

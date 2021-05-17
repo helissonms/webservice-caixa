@@ -8,8 +8,6 @@ class Pagamento
     public const TIPO_ACEITA_VALORES_ENTRE_MINIMO_MAXIMO = 'ACEITA_VALORES_ENTRE_MINIMO_MAXIMO';
     public const TIPO_SOMENTE_VALOR_MINIMO = 'SOMENTE_VALOR_MINIMO';
     public const TIPO_NAO_ACEITA_VALOR_DIVERGENTE = 'NAO_ACEITA_VALOR_DIVERGENTE';
-    public const TIPO_ACEITA_QUALQUER_VALOR = 'ACEITA_QUALQUER_VALOR';
-    public const TIPO_ACEITA_VALORES_ENTRE_MINIMO_MAXIMO = 'ACEITA_VALORES_ENTRE_MINIMO_MAXIMO';
 
     /**
      * (NE030) Identificação do Tipo de Pagamento
@@ -19,8 +17,6 @@ class Pagamento
         self::TIPO_ACEITA_VALORES_ENTRE_MINIMO_MAXIMO,
         self::TIPO_SOMENTE_VALOR_MINIMO,
         self::TIPO_NAO_ACEITA_VALOR_DIVERGENTE,
-        self::TIPO_ACEITA_QUALQUER_VALOR,
-        self::TIPO_ACEITA_VALORES_ENTRE_MINIMO_MAXIMO,
     ];
 
     /**
@@ -136,5 +132,10 @@ class Pagamento
     public function getPercentualMaximo()
     {
         return $this->percentualMaximo;
+    }
+
+    public static function naoAceitaValorDivergente()
+    {
+        return (new static(self::TIPO_NAO_ACEITA_VALOR_DIVERGENTE, 1, 0.00, 0.00));
     }
 }

@@ -3,6 +3,7 @@
 namespace WebserviceCaixa\Models;
 
 use WebserviceCaixa\Exceptions\PessoaTipoInvalidoException;
+use Illuminate\Support\Str;
 
 class Pessoa
 {
@@ -51,7 +52,7 @@ class Pessoa
         }
 
         $this->tipo = $tipo;
-        $this->nome = $nome;
+        $this->nome = Str::upper(Str::ascii($nome));
         $this->documento = preg_replace('/\D/', '', $documento);
     }
 
