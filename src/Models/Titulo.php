@@ -102,6 +102,13 @@ class Titulo
     protected $sacadorAvalista;
 
     /**
+     * (NE022 e NE023) Configuração da multa a ser aplicada.
+     *
+     * @property \WebserviceCaixa\Models\Multa
+     */
+    protected $multa;
+
+    /**
      * (NE024, NE024A e NE025) Array de descontos, sendo considerado até 3 descontos
      *
      * @property array
@@ -328,6 +335,25 @@ class Titulo
     public function getSacadorAvalista()
     {
         return $this->sacadorAvalista;
+    }
+
+    /**
+     * @param \WebserviceCaixa\Models\Multa $multa
+     *
+     * @return \WebserviceCaixa\Models\Titulo
+     */
+    public function setMulta(Multa $multa)
+    {
+        $this->multa = $multa;
+        return $this;
+    }
+
+    /**
+     * @return null|\WebserviceCaixa\Models\Multa
+     */
+    public function getMulta()
+    {
+        return $this->multa;
     }
 
     /**
