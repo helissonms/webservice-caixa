@@ -19,6 +19,11 @@ use WebserviceCaixa\Models\Desconto;
 
 class Webservice
 {
+    public const OPERACAO_ALTERA_BOLETO = 'ALTERA_BOLETO';
+    public const OPERACAO_BAIXA_BOLETO = 'BAIXA_BOLETO';
+    public const OPERACAO_CONSULTA_BOLETO = 'CONSULTA_BOLETO';
+    public const OPERACAO_INCLUI_BOLETO = 'INCLUI_BOLETO';
+
     /**
      * Unica informação disponível na documentação,
      * é que o endpoint espera receber o valor '2.1'
@@ -86,7 +91,7 @@ class Webservice
     {
         [$dom, $dados] = $this->getEstruturaPrincipal($titulo);
 
-        $incluiBoleto = $dados->appendChild(new DOMElement('INCLUI_BOLETO'));
+        $incluiBoleto = $dados->appendChild(new DOMElement(self::OPERACAO_INCLUI_BOLETO));
         $incluiBoleto->appendChild(new DOMElement('CODIGO_BENEFICIARIO', $this->beneficiario->getCodigo()));
 
         $incluiBoleto = $titulo->toDOMNode($incluiBoleto);
@@ -98,7 +103,7 @@ class Webservice
                 ],
                 'headers' => [
                     'Content-Type' => 'application/xml',
-                    'SOAPAction' => 'INCLUI_BOLETO',
+                    'SOAPAction' => self::OPERACAO_INCLUI_BOLETO,
                 ],
                 'body' => $dom->saveXML(),
             ]);
@@ -106,13 +111,54 @@ class Webservice
         return $this->trataResposta((string) $resposta->getBody());
     }
 
-    protected function getEstruturaPrincipal(Titulo $titulo, string $operacao = 'INCLUI_BOLETO')
+    /**
+     * Consulta o titulo informado como parametro.
+     * Neste caso só é necessário instanciar o Titulo com parâmetros obrigatórios.
+     *
+     * @param \WebserviceCaixa\Models\Titulo $titulo
+     *
+     * @return stdClass|object
+     *
+     * @throws \GuzzleHttp\Exception\ClientException
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ConnectException
+     * @throws \GuzzleHttp\Exception\TransferException
+     */
+    public function consultaBoleto(Titulo $titulo)
+    {
+        [$dom, $dados] = $this->getEstruturaPrincipal($titulo, self::OPERACAO_CONSULTA_BOLETO);
+
+        $consultaBoleto = $dados->appendChild(new DOMElement(self::OPERACAO_CONSULTA_BOLETO));
+        $consultaBoleto->appendChild(new DOMElement('CODIGO_BENEFICIARIO', $this->beneficiario->getCodigo()));
+        $consultaBoleto->appendChild(new DOMElement('NOSSO_NUMERO', $titulo->getNossoNumero()));
+
+        $resposta = (new HttpClient)
+            ->post('https://barramento.caixa.gov.br/sibar/ConsultaCobrancaBancaria/Boleto', [
+                'curl' => [
+                    CURLOPT_SSL_CIPHER_LIST => 'DEFAULT:!DH',
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/xml',
+                    'SOAPAction' => self::OPERACAO_CONSULTA_BOLETO,
+                ],
+                'body' => $dom->saveXML(),
+            ]);
+
+        return $this->trataResposta((string) $resposta->getBody());
+    }
+
+    protected function getEstruturaPrincipal(Titulo $titulo, string $operacao = self::OPERACAO_INCLUI_BOLETO)
     {
         $dom = new DOMDocument('1.0', 'utf-8');
 
         $raiz = $dom->createElementNS('http://schemas.xmlsoap.org/soap/envelope/', 'soapenv:Envelope');
-        $raiz->setAttribute('xmlns:ext', 'http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo');
         $raiz->setAttribute('xmlns:sib', 'http://caixa.gov.br/sibar');
+
+        if ($operacao === self::OPERACAO_CONSULTA_BOLETO) {
+            $raiz->setAttribute('xmlns:ext', 'http://caixa.gov.br/sibar/consulta_cobranca_bancaria/boleto');
+        } else {
+            $raiz->setAttribute('xmlns:ext', 'http://caixa.gov.br/sibar/manutencao_cobranca_bancaria/boleto/externo');
+        }
 
         $raiz->appendChild($dom->createElement('soapenv:Header'));
 
@@ -122,7 +168,7 @@ class Webservice
 
         $cabecalho = $servicoEntrada->appendChild($dom->createElement('sib:HEADER'));
 
-        $this->setDadosCabecalho($cabecalho, $titulo);
+        $this->setDadosCabecalho($cabecalho, $titulo, $operacao);
 
         $dados = $servicoEntrada->appendChild(new DOMElement('DADOS'));
 
@@ -131,10 +177,10 @@ class Webservice
         return [$dom, $dados];
     }
 
-    protected function setDadosCabecalho(DOMNode $cabecalho, Titulo $titulo, string $operacao = 'INCLUI_BOLETO')
+    protected function setDadosCabecalho(DOMNode $cabecalho, Titulo $titulo, string $operacao = self::OPERACAO_INCLUI_BOLETO)
     {
         $cabecalho->appendChild(new DOMElement('VERSAO', $this->versao));
-        $cabecalho->appendChild(new DOMElement('AUTENTICACAO', $this->getAutenticacao($this->beneficiario, $titulo)));
+        $cabecalho->appendChild(new DOMElement('AUTENTICACAO', $this->getAutenticacao($this->beneficiario, $titulo, $operacao)));
         $cabecalho->appendChild(new DOMElement('USUARIO_SERVICO', $this->usuarioServico));
         $cabecalho->appendChild(new DOMElement('OPERACAO', $operacao));
         $cabecalho->appendChild(new DOMElement('SISTEMA_ORIGEM', $this->sistemaOrigem));
@@ -143,12 +189,19 @@ class Webservice
         return $cabecalho;
     }
 
-    protected function getAutenticacao(Beneficiario $beneficiario, Titulo $titulo)
+    protected function getAutenticacao(Beneficiario $beneficiario, Titulo $titulo, $operacao = self::OPERACAO_INCLUI_BOLETO)
     {
         $dados = $beneficiario->getCodigo();
         $dados .= $titulo->getNossoNumero();
-        $dados .= $titulo->getDataVencimento()->format('dmY');
-        $dados .= str_pad(number_format($titulo->getValor(), 2, '', ''), 15, '0', STR_PAD_LEFT);
+
+        if (in_array($operacao, [self::OPERACAO_BAIXA_BOLETO, self::OPERACAO_CONSULTA_BOLETO])) {
+            $dados .= str_pad('', 8, '0');
+            $dados .= str_pad('', 15, '0');
+        } else {
+            $dados .= $titulo->getDataVencimento()->format('dmY');
+            $dados .= str_pad(number_format($titulo->getValor(), 2, '', ''), 15, '0', STR_PAD_LEFT);
+        }
+
         $dados .= $beneficiario->getCnpj();
 
         $hash = hash('sha256', $dados, true);
@@ -168,7 +221,7 @@ class Webservice
     {
         $objeto = $objeto ?: new stdClass;
 
-        foreach ($node->childNodes as $node) {
+        foreach ($node->childNodes as $indice => $node) {
             if ($node->hasAttributes()) {
                 $objeto->_attributes = new stdClass;
 
@@ -177,7 +230,11 @@ class Webservice
                 }
             }
 
-            $objeto->{$node->localName} = $node->hasChildNodes() && $node->firstChild->nodeType === XML_ELEMENT_NODE
+            $propriedade = property_exists($objeto, $node->localName)
+                ? "{$node->localName}{$indice}"
+                : $node->localName;
+
+            $objeto->{$propriedade} = $node->hasChildNodes() && $node->firstChild->nodeType === XML_ELEMENT_NODE
                 ? $this->converteXMLParaObjeto($node)
                 : $node->nodeValue;
         }
