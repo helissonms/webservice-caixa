@@ -479,7 +479,7 @@ class Titulo
                 if ($chave === 'descontos') {
                     $descontos = $titulo->appendChild(new DOMElement('DESCONTOS'));
 
-                    foreach ($valor as $desconto) {
+                    foreach ($valor ?: [Desconto::isento()] as $desconto) {
                         $desconto->toDOMNode($descontos);
                     }
 

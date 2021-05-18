@@ -96,6 +96,11 @@ class Desconto
         return $this->data;
     }
 
+    public static function isento()
+    {
+        return new static(self::TIPO_ISENTO);
+    }
+
     public function toDOMNode(DOMNode $no)
     {
         $desconto = $no->appendChild(new DOMElement('DESCONTO'));
