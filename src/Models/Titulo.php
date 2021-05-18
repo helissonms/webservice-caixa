@@ -168,6 +168,7 @@ class Titulo
 
         $this->juros = Juros::isento();
         $this->posVencimento = PosVencimento::devolver();
+        $this->pagamento = Pagamento::naoAceitaValorDivergente();
     }
 
     /**
@@ -334,9 +335,9 @@ class Titulo
      *
      * @return \WebserviceCaixa\Models\Titulo
      */
-    public function setPagamento(Pagamento $pagamento)
+    public function setPagamento(Pagamento $pagamento = null)
     {
-        $this->pagamento = $pagamento;
+        $this->pagamento = $pagamento ?: Pagamento::naoAceitaValorDivergente();
         return $this;
     }
 
