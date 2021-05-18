@@ -4,6 +4,10 @@
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/helissonms/webservice-caixa",
+    "support": {
+        "issues": "https://github.com/helissonms/webservice-caixa/issues",
+        "source": "https://github.com/helissonms/webservice-caixa"
+    },
     "authors": [
         {
             "name": "Hélisson Müller",
@@ -12,9 +16,9 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "illuminate/support": "^7.30",
-        "illuminate/contracts": "^7.30",
-        "guzzlehttp/guzzle": "^7.0"
+        "illuminate/support": "^6.0|^7.0|^8.0",
+        "illuminate/contracts": "^6.0|^7.0|^8.0",
+        "guzzlehttp/guzzle": "^6.5|^7.0"
     },
     "autoload": {
         "psr-4": {
