@@ -1,6 +1,6 @@
 {
     "name": "helissonms/webservice-caixa",
-    "description": "Integraçao com a Caixa Economica Federal para gerenciamento de boletos (registro/baixa/alteraçao)",
+    "description": "Integração com a Caixa Econômica Federal para gerenciamento de boletos (registro/baixa/alteração/consulta)",
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/helissonms/webservice-caixa",
