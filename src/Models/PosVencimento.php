@@ -71,7 +71,7 @@ class PosVencimento
 
     public static function devolver(int $numeroDias = 0)
     {
-        return new static(self::ACAO_DEVOLVER, $numeroDias = 0);
+        return new static(self::ACAO_DEVOLVER, $numeroDias);
     }
 
     public static function protestar(int $numeroDias = 2)
