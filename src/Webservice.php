@@ -89,24 +89,14 @@ class Webservice
      */
     public function incluiBoleto(Titulo $titulo)
     {
-        [$dom, $dados] = $this->getEstruturaPrincipal($titulo);
+        [$dom, $dados] = $this->getEstruturaPrincipal($titulo, self::OPERACAO_INCLUI_BOLETO);
 
         $incluiBoleto = $dados->appendChild(new DOMElement(self::OPERACAO_INCLUI_BOLETO));
         $incluiBoleto->appendChild(new DOMElement('CODIGO_BENEFICIARIO', $this->beneficiario->getCodigo()));
 
         $incluiBoleto = $titulo->toDOMNode($incluiBoleto);
 
-        $resposta = (new HttpClient)
-            ->post('https://barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo', [
-                'curl' => [
-                    CURLOPT_SSL_CIPHER_LIST => 'DEFAULT:!DH',
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/xml',
-                    'SOAPAction' => self::OPERACAO_INCLUI_BOLETO,
-                ],
-                'body' => $dom->saveXML(),
-            ]);
+        $resposta = $this->requisicao(self::OPERACAO_INCLUI_BOLETO, $dom->saveXML());
 
         return $this->trataResposta((string) $resposta->getBody());
     }
@@ -132,19 +122,39 @@ class Webservice
         $consultaBoleto->appendChild(new DOMElement('CODIGO_BENEFICIARIO', $this->beneficiario->getCodigo()));
         $consultaBoleto->appendChild(new DOMElement('NOSSO_NUMERO', $titulo->getNossoNumero()));
 
-        $resposta = (new HttpClient)
-            ->post('https://barramento.caixa.gov.br/sibar/ConsultaCobrancaBancaria/Boleto', [
+        $resposta = $this->requisicao(self::OPERACAO_CONSULTA_BOLETO, $dom->saveXML());
+
+        return $this->trataResposta((string) $resposta->getBody());
+    }
+
+    /**
+     * @param string $operacao Operação a ser executada
+     * @param string $xml XML da operação
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\ClientException
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ConnectException
+     * @throws \GuzzleHttp\Exception\TransferException
+     */
+    public function requisicao(string $operacao, string $xml)
+    {
+        $url = $operacao === self::OPERACAO_CONSULTA_BOLETO
+            ? 'https://barramento.caixa.gov.br/sibar/ConsultaCobrancaBancaria/Boleto'
+            : 'https://barramento.caixa.gov.br/sibar/ManutencaoCobrancaBancaria/Boleto/Externo';
+
+        return (new HttpClient)
+            ->post($url, [
                 'curl' => [
                     CURLOPT_SSL_CIPHER_LIST => 'DEFAULT:!DH',
                 ],
                 'headers' => [
                     'Content-Type' => 'application/xml',
-                    'SOAPAction' => self::OPERACAO_CONSULTA_BOLETO,
+                    'SOAPAction' => $operacao,
                 ],
-                'body' => $dom->saveXML(),
+                'body' => $xml,
             ]);
-
-        return $this->trataResposta((string) $resposta->getBody());
     }
 
     protected function getEstruturaPrincipal(Titulo $titulo, string $operacao = self::OPERACAO_INCLUI_BOLETO)
